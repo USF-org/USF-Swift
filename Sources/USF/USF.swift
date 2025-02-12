@@ -14,12 +14,9 @@ struct USF: Codable {
         
         enum CodingKeys: String, CodingKey {
             case simplifiedName = "simplified_name"
-            case teacher, room
+            case teacher
+            case room
         }
-    }
-    
-    enum WeekType: String, Codable {
-        case all, even, odd
     }
     
     struct TimetableEntry: Codable {
@@ -27,6 +24,10 @@ struct USF: Codable {
         let weekType: WeekType
         let subjectName: String
         let period: Int
+    }
+    
+    enum WeekType: String, Codable {
+        case all, even, odd
     }
 }
 

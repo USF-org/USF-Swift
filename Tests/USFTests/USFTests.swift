@@ -20,7 +20,12 @@ final class USFTests: XCTestCase {
                 ["09:00:00", "09:45:00"]
             ],
             "timetable": [
-                [1, "all", "Math", 1]
+                {
+                    "day": 1,
+                    "weekType": "all",
+                    "subjectName": "Math",
+                    "period": 1
+                }
             ]
         }
         """
@@ -35,6 +40,10 @@ final class USFTests: XCTestCase {
             XCTAssertEqual(usf.subjects["Math"]?.room, "101")
             XCTAssertEqual(usf.periods.count, 2)
             XCTAssertEqual(usf.timetable.count, 1)
+            XCTAssertEqual(usf.timetable[0].day, 1)
+            XCTAssertEqual(usf.timetable[0].weekType, .all)
+            XCTAssertEqual(usf.timetable[0].subjectName, "Math")
+            XCTAssertEqual(usf.timetable[0].period, 1)
         } catch {
             XCTFail("Failed to decode USF: \(error)")
         }
