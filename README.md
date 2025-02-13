@@ -5,6 +5,7 @@ Swift Package for Access USF
 The **Universal Schedule Format (USF)** is a compact and efficient format for storing school schedules in JSON. This Swift package provides tools to read, modify, validate, and generate USF files. It includes functionalities to manage subjects, periods, and timetables in a structured format, ideal for use in educational scheduling applications.
 
 This package allows you to:
+
   • Load and decode USF files.  
   • Check if a USF file is valid.  
   • Retrieve timetable entries.  
