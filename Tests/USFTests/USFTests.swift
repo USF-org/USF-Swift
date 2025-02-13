@@ -89,30 +89,75 @@ final class USFTests: XCTestCase {
     // 测试 USF 生成 JSON
     func testGenerateUSF() {
         let usf = USF(version: 1, subjects: [:], periods: [], timetable: [])
-        let data = generateUSF(usf: usf)
-        XCTAssertNotNil(data)
+        let result = generateUSF(usf: usf)
+        
+        switch result {
+        case .success(let data):
+            XCTAssertNotNil(data)
+        case .failure(let error):
+            XCTFail("Failed to generate USF: \(error)")
+        }
     }
     
     // 测试添加学科
     func testAddSubject() {
         var usf = USF(version: 1, subjects: [:], periods: [], timetable: [])
-        addSubject(to: &usf, name: "Physics", simplifiedName: "物理", teacher: "李老师", room: "102")
+        let result = addSubject(to: &usf, name: "Physics", simplifiedName: "物理", teacher: "李老师", room: "102")
         
-        XCTAssertEqual(usf.subjects["Physics"]?.simplifiedName, "物理")
-        XCTAssertEqual(usf.subjects["Physics"]?.teacher, "李老师")
-        XCTAssertEqual(usf.subjects["Physics"]?.room, "102")
+        switch result {
+        case .success:
+            XCTAssertEqual(usf.subjects["Physics"]?.simplifiedName, "物理")
+            XCTAssertEqual(usf.subjects["Physics"]?.teacher, "李老师")
+            XCTAssertEqual(usf.subjects["Physics"]?.room, "102")
+        case .failure(let error):
+            XCTFail("Failed to add subject: \(error)")
+        }
+    }
+    
+    // 测试添加已有学科
+    func testAddSubjectAlreadyExists() {
+        var usf = USF(version: 1, subjects: ["Math": USF.Subject(simplifiedName: "数学", teacher: "张老师", room: "101")], periods: [], timetable: [])
+        let result = addSubject(to: &usf, name: "Math", simplifiedName: "数学", teacher: "张老师", room: "101")
+        
+        switch result {
+        case .success:
+            XCTFail("Subject should already exist")
+        case .failure(let error):
+            XCTAssertEqual(error, USFError.subjectAlreadyExists)
+        }
     }
     
     // 测试添加课程信息
     func testAddTimetableEntry() {
         var usf = USF(version: 1, subjects: ["Math": USF.Subject(simplifiedName: "数学", teacher: "张老师", room: "101")], periods: [], timetable: [])
-        addTimetableEntry(to: &usf, day: 2, weekType: .even, subjectName: "Math", period: 2)
+        let result = addTimetableEntry(to: &usf, day: 2, weekType: .even, subjectName: "Math", period: 2)
         
-        XCTAssertEqual(usf.timetable.count, 1)
-        XCTAssertEqual(usf.timetable[0].day, 2)
-        XCTAssertEqual(usf.timetable[0].weekType, .even)
-        XCTAssertEqual(usf.timetable[0].subjectName, "Math")
-        XCTAssertEqual(usf.timetable[0].period, 2)
+        switch result {
+        case .success:
+            XCTAssertEqual(usf.timetable.count, 1)
+            XCTAssertEqual(usf.timetable[0].day, 2)
+            XCTAssertEqual(usf.timetable[0].weekType, .even)
+            XCTAssertEqual(usf.timetable[0].subjectName, "Math")
+            XCTAssertEqual(usf.timetable[0].period, 2)
+        case .failure(let error):
+            XCTFail("Failed to add timetable entry: \(error)")
+        }
+    }
+    
+    // 测试添加已有课程表项
+    func testAddTimetableEntryAlreadyExists() {
+        var usf = USF(version: 1, subjects: ["Math": USF.Subject(simplifiedName: "数学", teacher: "张老师", room: "101")], periods: [], timetable: [
+            USF.TimetableEntry(day: 1, weekType: .all, subjectName: "Math", period: 1)
+        ])
+        
+        let result = addTimetableEntry(to: &usf, day: 1, weekType: .all, subjectName: "Math", period: 1)
+        
+        switch result {
+        case .success:
+            XCTFail("Timetable entry should already exist")
+        case .failure(let error):
+            XCTAssertEqual(error, USFError.timetableEntryAlreadyExists)
+        }
     }
     
     // 测试保存文件
@@ -120,9 +165,12 @@ final class USFTests: XCTestCase {
         let usf = USF(version: 1, subjects: [:], periods: [], timetable: [])
         let fileURL = writeTempFile(named: "test.usf", content: "")
         
-        saveUSF(usf, to: fileURL)
-        
-        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+        switch saveUSF(usf, to: fileURL) {
+        case .success:
+            XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+        case .failure(let error):
+            XCTFail("Failed to save USF file: \(error)")
+        }
     }
     
     // ** 辅助方法 **
