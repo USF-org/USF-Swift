@@ -107,7 +107,7 @@ case .failure(let error):
 ```
 
 ## Errors Handling
-After USF-Swift releases version 1.2.0, we introduces following new error handlings:
+After USF-Swift releases version 0.2.0, we introduces following new error handlings:
 
 	•	USFError.subjectAlreadyExists: Raised when attempting to add a subject that already exists in the file.
  
